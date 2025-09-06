@@ -56,13 +56,76 @@ Step 7: Save Your Work
 
 
 # Program
+```
+#include <LiquidCrystal.h>
 
----
+// LCD pin mapping: (RS, E, D4, D5, D6, D7)
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+const int tempPin = A0;      // TMP36 output pin
+const int motorPin = 9;      // Motor PWM pin
+const int ledPin = 7;        // LED pin
+
+void setup() {
+  pinMode(motorPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+
+  // Initialize LCD
+  lcd.begin(16, 2);
+  lcd.print("Temp & Motor");
+  delay(2000);
+  lcd.clear();
+}
+
+void loop() {
+  int sensorValue = analogRead(tempPin);
+  
+  // Convert TMP36 reading to temperature in Celsius
+  float voltage = sensorValue * (5.0 / 1023.0);
+  float temperatureC = (voltage - 0.5) * 100.0;
+
+  // Map temperature to PWM speed (20°C = stop, 40°C = full speed)
+  int motorSpeed = map(temperatureC, 20, 40, 0, 255);
+  motorSpeed = constrain(motorSpeed, 0, 255);
+
+  analogWrite(motorPin, motorSpeed);
+
+  // LED indicator ON if motor running
+  if (motorSpeed > 0) {
+    digitalWrite(ledPin, HIGH);
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
+
+  // Display on Serial Monitor
+  Serial.print("Temperature: ");
+  Serial.print(temperatureC);
+  Serial.print(" C, Motor Speed: ");
+  Serial.println(motorSpeed);
+
+  // Display on LCD
+  lcd.setCursor(0, 0);
+  lcd.print("Temp: ");
+  lcd.print(temperatureC);
+  lcd.print("C   ");
+
+  lcd.setCursor(0, 1);
+  lcd.print("Speed: ");
+  lcd.print(motorSpeed);
+  lcd.print("   ");
+
+  delay(500);
+}
+```
+
+
 To upload
---
+
 
 # Result
+FAN SPEED CONTROLLER SYSTEM USING TEMPERATURE SENSOR USING TINKERCAD EXECUTED SUCCESSfully.
 
----
 To upload
---
+<img width="1113" height="501" alt="image" src="https://github.com/user-attachments/assets/0700241e-37a4-4a8e-9a47-ce517cfbdf42" />
+
